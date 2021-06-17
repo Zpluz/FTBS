@@ -221,8 +221,15 @@ def order(request):
                     cur_order = Order(user=request.user, passenger=passenger, flight=order_flight, seat=seat,
                                       order_price=order_flight.flight_price, order_state=0, order_time=timezone.now())
 
-            if Order.objects.filter(passenger=passenger, flight=order_flight, order_state__lt=2):
-                messages.error(request, '您有行程冲突!')
+            conflict_flag = 0
+            passenger_orders = Order.objects.filter(passenger=passenger, order_state__lt=4)
+            for i in passenger_orders:
+                if not (order_flight.takeoff_time >= i.flight.landing_time or
+                        order_flight.landing_time <= i.flight.takeoff_time):
+                    conflict_flag = 1
+                    break
+            if conflict_flag:
+                messages.error(request, '您有行程冲突, 无法订票!')
                 storage = messages.get_messages(request)
                 return render(request, 'order.html', {'messages': storage, 'flight_code': order_flight.code,
                                                       'remains': len(seats_remain), 'seats_remain': seats_remain,
