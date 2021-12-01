@@ -1,7 +1,7 @@
  
 
-# FTBS
-Flight ticket booking system
+# Airline Reservation System
+Airline Reservation System
 
 ### Environment Configuration ###
 ***MySQL***: ***8.0.24 (in Docker)***
